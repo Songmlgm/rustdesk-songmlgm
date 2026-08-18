@@ -16,7 +16,6 @@ import 'package:flutter_hbb/desktop/widgets/update_progress.dart';
 import 'package:flutter_hbb/models/platform_model.dart';
 import 'package:flutter_hbb/models/server_model.dart';
 import 'package:flutter_hbb/models/state_model.dart';
-import 'package:flutter_hbb/plugin/ui_manager.dart';
 import 'package:flutter_hbb/utils/multi_window_manager.dart';
 import 'package:flutter_hbb/utils/platform_channel.dart';
 import 'package:get/get.dart';
@@ -111,7 +110,6 @@ class _DesktopHomePageState extends State<DesktopHomePage>
           }
         },
       ),
-      buildPluginEntry(),
     ];
     if (isIncomingOnly) {
       children.addAll([
@@ -256,7 +254,28 @@ class _DesktopHomePageState extends State<DesktopHomePage>
   }
 
   Widget buildPopupMenu(BuildContext context) {
-return Container();
+    final textColor = Theme.of(context).textTheme.titleLarge?.color;
+    RxBool hover = false.obs;
+    return InkWell(
+      onTap: DesktopTabPage.onAddSetting,
+      child: Tooltip(
+        message: translate('Settings'),
+        child: Obx(
+          () => CircleAvatar(
+            radius: 15,
+            backgroundColor: hover.value
+                ? Theme.of(context).scaffoldBackgroundColor
+                : Theme.of(context).colorScheme.background,
+            child: Icon(
+              Icons.more_vert_outlined,
+              size: 20,
+              color: hover.value ? textColor : textColor?.withOpacity(0.5),
+            ),
+          ),
+        ),
+      ),
+      onHover: (value) => hover.value = value,
+    );
   }
 
   buildPasswordBoard(BuildContext context) {
@@ -338,7 +357,24 @@ return Container();
                           ),
                           onHover: (value) => refreshHover.value = value,
                         ).marginOnly(right: 8, top: 4),
-
+                      if (!bind.isDisableSettings())
+                        InkWell(
+                          child: Tooltip(
+                            message: translate('Change Password'),
+                            child: Obx(
+                              () => Icon(
+                                Icons.edit,
+                                color: editHover.value
+                                    ? textColor
+                                    : Color(0xFFDDDDDD),
+                                size: 22,
+                              ).marginOnly(right: 8, top: 4),
+                            ),
+                          ),
+                          onTap: () => DesktopSettingPage.switch2page(
+                              SettingsTabKey.safety),
+                          onHover: (value) => editHover.value = value,
+                        ),
                     ],
                   ),
                 ],
@@ -851,21 +887,6 @@ return Container();
     if (state == AppLifecycleState.resumed) {
       shouldBeBlocked(_block, canBeBlocked);
     }
-  }
-
-  Widget buildPluginEntry() {
-    final entries = PluginUiManager.instance.entries.entries;
-    return Offstage(
-      offstage: entries.isEmpty,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ...entries.map((entry) {
-            return entry.value;
-          })
-        ],
-      ),
-    );
   }
 }
 
