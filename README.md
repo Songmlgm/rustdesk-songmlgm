@@ -1,1 +1,5 @@
-master 为 服务器地址S*.club ,主控端。
+RuskDesk V1.4.9  自用版本
+
+1、master 为主控端。
+
+2、 服务器地址S*.club
