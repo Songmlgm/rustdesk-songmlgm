@@ -1,18 +1,15 @@
-name: Flutter Tag Build
+name: flutter-tag
+# 👇 这里增加权限，传给被调用的复用工作流
+permissions:
+  contents: write
+  pull-requests: read
 
 on:
-  workflow_dispatch:
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
-      - '[0-9]+.[0-9]+.[0-9]+'
-      - 'v[0-9]+.[0-9]+.[0-9]+-[0-9]+'
-      - '[0-9]+.[0-9]+.[0-9]+-[0-9]+'
+      - 'v*'
 
 jobs:
-  run-flutter-tag-build:
-    uses: ./.github/workflows/flutter-build.yml
-    secrets: inherit
-    with:
-      upload-artifact: true
-      upload-tag: ${{ github.ref_name }}
+  build:
+    uses: Songmlgm/rustdesk-songmlgm/.github/workflows/flutter-build.yml@a5cff6c4be813a64a80b4abc734f49799bef358c
+    # 不要在这里写 permissions，要写在 workflow 顶层！
